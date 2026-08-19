@@ -144,34 +144,68 @@ html{ scroll-behavior: smooth; }
 #view-home a{ text-decoration: none; color: inherit; }
 #view-home button{ font-family: inherit; cursor: pointer; }
 #view-home .navbar{
-  position: sticky; top: 0; z-index: 100;
-  background: var(--white);
-  border-bottom: 1px solid var(--gray-200);
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: transparent;
   padding: 0 clamp(1rem, 3vw, 2.25rem);
-  height: 72px;
+  height: 78px;
   display: flex; align-items: center; justify-content: space-between;
   gap: 20px;
+  box-shadow: 0 6px 20px rgba(8,44,44,0.14);
+  transition: height .3s ease, background .3s ease, box-shadow .3s ease, -webkit-backdrop-filter .3s ease, backdrop-filter .3s ease;
+}
+/* Once the user scrolls, the bar picks up the palette teal + a stronger shadow */
+#view-home .navbar.scrolled{
+  height: 64px;
+  background: rgba(16, 108, 108, 0.88);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+  box-shadow: 0 12px 30px rgba(8,44,44,0.30);
 }
 #view-home .nav-brand{ display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 #view-home .nav-logo-img{
   height: 42px; width: auto; display: block;
   flex-shrink: 0;
+  /* render the logo white so it reads on the transparent hero + teal scrolled bar */
+  filter: brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0,0,0,0.28));
   transition: transform 0.2s ease;
 }
 #view-home .nav-brand:hover .nav-logo-img{ transform: scale(1.03); }
+/* fixed navbar overlay → keep anchored sections from hiding beneath it */
+#view-home section[id]{ scroll-margin-top: 84px; }
 #view-home .nav-links{ display: flex; gap: 6px; flex: 1; justify-content: center; }
 #view-home .nav-link{
-  padding: 9px 16px; border-radius: 8px;
+  padding: 9px 16px; border-radius: 10px;
   font-size: 14px; font-weight: 600; border: none;
-  background: transparent; color: var(--gray-700);
-  transition: background 0.18s ease, color 0.18s ease;
+  background: transparent; color: rgba(255,255,255,0.92);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.28);
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
   white-space: nowrap;
   display: inline-flex; align-items: center; gap: 6px;
   text-decoration: none;
   cursor: pointer;
 }
-#view-home .nav-link:hover{ background: var(--teal-50); color: var(--teal-700); }
-#view-home .nav-link.active{ background: var(--teal-50); color: var(--teal-700); }
+#view-home .nav-link:hover{ background: transparent; color: #fff; }
+#view-home .nav-link.active{ background: transparent; color: #fff; }
+/* keep text crisp on the solid teal scrolled bar */
+#view-home .navbar.scrolled .nav-link{ text-shadow: none; }
+
+/* Desktop top-level links: sliding gradient underline + subtle lift */
+#view-home .nav-links > .nav-link,
+#view-home .nav-links .nav-item > .nav-link{ position: relative; }
+#view-home .nav-links > .nav-link::after,
+#view-home .nav-links .nav-item > .nav-link::after{
+  content: ''; position: absolute; left: 15px; right: 15px; bottom: 4px; height: 2.5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--teal-300));
+  transform: scaleX(0); transform-origin: center;
+  transition: transform 0.3s cubic-bezier(.34,1.2,.42,1);
+}
+#view-home .nav-links > .nav-link:hover, 
+#view-home .nav-links .nav-item:hover > .nav-link{ transform: translateY(-1px); }
+#view-home .nav-links > .nav-link:hover::after,
+#view-home .nav-links > .nav-link.active::after,
+#view-home .nav-links .nav-item:hover > .nav-link::after,
+#view-home .nav-links .nav-item.open > .nav-link::after{ transform: scaleX(1); }
 #view-home .nav-link .chev{
   width: 12px; height: 12px; flex-shrink: 0;
   transition: transform 0.2s ease;
@@ -194,22 +228,38 @@ html{ scroll-behavior: smooth; }
 #view-home .nav-dropdown::before{
   content: ''; position: absolute; top: -12px; left: 0; right: 0; height: 12px;
 }
+#view-home .nav-dropdown::after{
+  content: ''; position: absolute; top: 0; left: 14px; right: 14px; height: 2.5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--teal-500), var(--gold));
+  opacity: 0.85;
+}
 #view-home .nav-item:hover > .nav-dropdown, #view-home .nav-item:focus-within > .nav-dropdown, #view-home .nav-item.open > .nav-dropdown{
   opacity: 1; visibility: visible;
   transform: translateX(-50%) translateY(0);
 }
-#view-home .nav-item:hover > .nav-link, #view-home .nav-item.open > .nav-link{ background: var(--teal-50); color: var(--teal-700); }
+#view-home .nav-item:hover > .nav-link, #view-home .nav-item.open > .nav-link{ background: transparent; color: #fff; }
 #view-home .nav-item:hover > .nav-link .chev, #view-home .nav-item.open > .nav-link .chev{ transform: rotate(180deg); }
 #view-home .nav-dropdown a{
-  display: block;
-  padding: 10px 14px; border-radius: 8px;
+  position: relative;
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 14px 10px 22px; border-radius: 8px;
   font-size: 14px; font-weight: 500; color: var(--gray-700);
   text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, padding 0.18s ease;
+}
+#view-home .nav-dropdown a::before{
+  content: ''; position: absolute; left: 12px; top: 50%;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal-500), var(--gold));
+  transform: translateY(-50%) scale(0);
+  transition: transform 0.18s ease;
 }
 #view-home .nav-dropdown a:hover{
   background: var(--teal-50); color: var(--teal-700);
+  padding-left: 26px;
 }
+#view-home .nav-dropdown a:hover::before{ transform: translateY(-50%) scale(1); }
 #view-home .nav-cta{ display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 #view-home .nav-wa{
   display: inline-flex; align-items: center; gap: 8px;
@@ -226,24 +276,26 @@ html{ scroll-behavior: smooth; }
 #view-home .nav-login{
   display: inline-flex; align-items: center; gap: 7px;
   padding: 9px 16px; border-radius: 999px;
-  background: transparent; color: var(--teal-800);
+  background: rgba(255,255,255,0.12); color: #fff;
   font-size: 13px; font-weight: 700;
-  border: 1.5px solid var(--teal-700);
-  transition: all 0.2s; white-space: nowrap;
+  border: 1.5px solid rgba(255,255,255,0.55);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  transition: all 0.2s ease; white-space: nowrap;
   text-decoration: none;
 }
-#view-home .nav-login:hover{ background: var(--teal-700); color: var(--white); }
+#view-home .nav-login:hover{ background: #fff; color: var(--teal-800); border-color: #fff; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
 #view-home .nav-login svg{ width: 15px; height: 15px; }
 #view-home .nav-hamburger{
-  display: none; width: 40px; height: 40px; border: none;
-  background: var(--teal-50); border-radius: 10px;
+  display: none; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,0.28);
+  background: rgba(255,255,255,0.12); border-radius: 10px;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
   flex-direction: column;
   align-items: center; justify-content: center; gap: 5px;
   cursor: pointer; flex-shrink: 0;
 }
 #view-home .nav-hamburger span{
   display: block; width: 18px; height: 2px;
-  background: var(--teal-900); border-radius: 2px;
+  background: #fff; border-radius: 2px;
   transition: all 0.3s;
 }
 #view-home .nav-hamburger.open span:nth-child(1){ transform: translateY(7px) rotate(45deg); }
@@ -1240,7 +1292,7 @@ html{ scroll-behavior: smooth; }
 #view-home .section-catalog{
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #2a2010 0%, #4a3618 46%, #6b4f24 100%);
+  background: linear-gradient(135deg, #0b3f3f 0%, #0f5e5e 48%, #0f766e 100%);
   padding: clamp(48px, 7vw, 84px) clamp(1rem, 4vw, 2rem);
   margin: clamp(32px, 5vw, 48px) 0 0;
   isolation: isolate;
@@ -1270,7 +1322,7 @@ html{ scroll-behavior: smooth; }
 #view-home .section-catalog::after{
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(30,20,8,0.55) 0%, rgba(74,54,24,0.15) 50%, rgba(18,52,50,0.35) 100%);
+  background: linear-gradient(135deg, rgba(8,44,44,0.55) 0%, rgba(15,94,94,0.12) 50%, rgba(12,74,74,0.4) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -1531,6 +1583,185 @@ html{ scroll-behavior: smooth; }
 }
 #view-home .btn-artikel-all svg{ width: 14px; height: 14px; transition: transform 0.25s; }
 #view-home .btn-artikel-all:hover svg{ transform: translateX(3px); }
+/* ═══════════════════ PENGIRIMAN SELURUH INDONESIA ═══════════════════ */
+#view-home .section-shipping{
+  position: relative;
+  overflow: hidden;
+  padding: clamp(44px, 6vw, 82px) clamp(1rem, 4vw, 2rem);
+}
+#view-home .shipping-inner{
+  position: relative; z-index: 1;
+  max-width: 1080px; margin: 0 auto;
+}
+#view-home .section-shipping .section-header.center{ text-align: center; justify-content: center; }
+#view-home .section-shipping .section-header.center > div{ max-width: 700px; margin: 0 auto; }
+#view-home .section-shipping .section-title{ margin-top: 4px; }
+#view-home .section-shipping .section-desc{ max-width: 600px; margin: 8px auto 0; }
+
+/* Map frame */
+#view-home .shipping-map-wrap{
+  position: relative;
+  margin: clamp(22px, 4vw, 38px) auto clamp(6px, 2vw, 12px);
+  max-width: 940px;
+  padding: clamp(14px, 3vw, 30px) clamp(10px, 3vw, 26px) clamp(10px, 2vw, 18px);
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse 62% 80% at 50% 38%, rgba(20,184,166,0.10), transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,0.62), rgba(240,253,250,0.32));
+  border: 1px solid rgba(15,118,110,0.10);
+  box-shadow: 0 22px 54px rgba(12,74,74,0.08);
+}
+#view-home .shipping-map{
+  display: block; width: 100%; height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 8px 16px rgba(12,74,74,0.14));
+}
+#view-home .ship-islands path{ stroke: none; }
+
+/* static outlet location points (Bandung, Yogyakarta, Surabaya) */
+#view-home .ship-point{
+  fill: var(--gold);
+  stroke: #fff; stroke-width: 2;
+  filter: drop-shadow(0 2px 3px rgba(8,44,44,0.35));
+}
+
+/* shipping route arcs from the Bandung hub */
+#view-home .ship-arc{
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-dasharray: 4 5;
+  opacity: 0.9;
+  animation: shipDash 1.5s linear infinite;
+  animation-delay: var(--d, 0s);
+}
+@keyframes shipDash{ to{ stroke-dashoffset: -18; } }
+
+/* destination markers */
+#view-home .ship-dot-core{ fill: var(--teal-700); }
+#view-home .ship-dot-pulse{
+  fill: var(--teal-500);
+  transform-box: fill-box; transform-origin: center;
+  animation: shipPulse 2.4s ease-out infinite;
+  animation-delay: var(--d, 0s);
+}
+@keyframes shipPulse{
+  0%{ transform: scale(0.55); opacity: 0.75; }
+  70%{ transform: scale(2.7); opacity: 0; }
+  100%{ transform: scale(2.7); opacity: 0; }
+}
+
+/* Bandung hub */
+#view-home .ship-hub-core{ fill: var(--gold); stroke: #fff; stroke-width: 1.6; }
+#view-home .ship-hub-ring{
+  fill: none; stroke: var(--gold); stroke-width: 1.6;
+  transform-box: fill-box; transform-origin: center;
+  animation: shipPulse 2.1s ease-out infinite;
+}
+
+/* legend */
+#view-home .shipping-legend{
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 18px;
+  margin-top: 6px;
+}
+#view-home .ship-leg{
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12.5px; font-weight: 600; color: var(--gray-600);
+}
+#view-home .ship-leg::before{
+  content: ''; width: 10px; height: 10px; border-radius: 50%;
+}
+#view-home .ship-leg-hub::before{ background: var(--gold); box-shadow: 0 0 0 3px rgba(200,169,110,0.22); }
+#view-home .ship-leg-dest::before{ background: var(--teal-600); box-shadow: 0 0 0 3px rgba(13,148,136,0.18); }
+
+/* attribution */
+#view-home .shipping-credit{
+  text-align: center;
+  font-size: 10.5px; color: var(--gray-400);
+  margin-top: 10px; letter-spacing: 0.01em;
+}
+#view-home .shipping-credit a{ color: var(--gray-400); text-decoration: underline; text-underline-offset: 2px; }
+#view-home .shipping-credit a:hover{ color: var(--teal-600); }
+
+/* stat chips */
+#view-home .shipping-stats{
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: clamp(12px, 2vw, 18px);
+  margin-top: clamp(24px, 4vw, 38px);
+}
+#view-home .ship-stat{
+  display: flex; align-items: center; gap: 13px;
+  padding: 14px 22px;
+  background: rgba(255,255,255,0.72);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  border: 1px solid rgba(15,118,110,0.12);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(12,74,74,0.06);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+#view-home .ship-stat:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgba(12,74,74,0.12);
+  border-color: rgba(200,169,110,0.5);
+}
+#view-home .ship-stat-ico{
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; flex-shrink: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--teal-600), var(--teal-800));
+  color: #fff;
+}
+#view-home .ship-stat-ico svg{ width: 21px; height: 21px; }
+#view-home .ship-stat > div{ display: flex; flex-direction: column; line-height: 1.15; }
+#view-home .ship-stat strong{
+  font-family: 'Poppins', sans-serif;
+  font-size: 19px; font-weight: 800; color: var(--teal-900);
+  letter-spacing: -0.01em;
+}
+#view-home .ship-stat span{ font-size: 12.5px; font-weight: 500; color: var(--gray-500); }
+
+/* CTA */
+#view-home .shipping-cta{
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  margin-top: clamp(24px, 4vw, 36px);
+}
+#view-home .btn-shipping{
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 28px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--teal-600), var(--teal-800));
+  color: #fff; font-size: 15px; font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 10px 26px rgba(13,148,136,0.32);
+  border: 1px solid rgba(255,255,255,0.14);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+#view-home .btn-shipping svg{ width: 19px; height: 19px; }
+#view-home .btn-shipping:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(13,148,136,0.42);
+  background: linear-gradient(135deg, var(--teal-500), var(--teal-700));
+}
+#view-home .shipping-cta-note{ font-size: 12.5px; color: var(--gray-500); font-weight: 500; }
+
+@media (max-width: 600px){
+  #view-home .shipping-stats{ gap: 10px; }
+  #view-home .ship-stat{ flex: 1 1 100%; padding: 12px 16px; }
+  #view-home .ship-stat-ico{ width: 38px; height: 38px; }
+  #view-home .ship-stat-ico svg{ width: 19px; height: 19px; }
+  #view-home .ship-stat strong{ font-size: 17px; }
+  #view-home .shipping-map-wrap{ padding: 14px 8px 10px; border-radius: 18px; }
+  #view-home .shipping-legend{ gap: 14px; }
+  #view-home .ship-leg{ font-size: 11.5px; }
+}
+@media (prefers-reduced-motion: reduce){
+  #view-home .ship-arc,
+  #view-home .ship-dot-pulse,
+  #view-home .ship-hub-ring,
+  #view-home .navbar::before{ animation: none; }
+  #view-home .ship-dot-pulse{ opacity: 0; }
+}
+
 #view-home .section-outlet{
   padding: clamp(40px, 6vw, 64px) clamp(1rem, 4vw, 2rem);
   max-width: 1120px; margin: 0 auto;
@@ -2100,7 +2331,7 @@ html{ scroll-behavior: smooth; }
 @media (max-width: 768px){
 #view-home .deco-dots, #view-home .deco-ring{ display: none; }
 }
-#view-home .section-new, #view-home .section-recommended, #view-home .section-best, #view-home .section-artikel, #view-home .promo-section, #view-home .partners-section, #view-home .section-catalog, #view-home .testimonial-section, #view-home .section-cta, #view-home .section-outlet, #view-home .section-why{
+#view-home .section-new, #view-home .section-recommended, #view-home .section-best, #view-home .section-artikel, #view-home .promo-section, #view-home .partners-section, #view-home .section-catalog, #view-home .section-shipping, #view-home .section-cta, #view-home .section-outlet, #view-home .section-why{
   position: relative;
 }
 #view-home .section-new > .section-header, #view-home .section-new > .recommended-grid, #view-home .section-recommended > .section-header, #view-home .section-recommended > .recommended-grid, #view-home .section-recommended > .recommended-cta-wrap, #view-home .section-best > *, #view-home .section-artikel > *, #view-home .promo-section > *{ position: relative; z-index: 1; }
@@ -2141,12 +2372,14 @@ html{ scroll-behavior: smooth; }
 #view-home .bottom-nav{ display: block; }
 #view-home{ padding-bottom: 72px; }
 #view-home .navbar{ height: 60px; gap: 8px; padding: 0 14px; }
+#view-home .navbar.scrolled{ height: 60px; }
 #view-home .nav-logo-img{ height: 36px; }
 #view-home .mobile-menu{ top: 60px; }
 #view-home .mobile-menu-backdrop{ top: 60px; }
 #view-home .section-new, #view-home .section-recommended, #view-home .section-best, #view-home .section-artikel{ padding: 24px 12px 32px; }
 #view-home .promo-section{ padding: 24px 12px; }
 #view-home .section-catalog{ padding: 40px 14px; }
+#view-home .section-shipping{ padding: 34px 12px; }
 #view-home .section-cta{ padding: 28px 14px; }
 #view-home .section-header{ margin-bottom: 16px; gap: 8px; }
 #view-home .section-title{ font-size: 20px !important; line-height: 1.2; }
