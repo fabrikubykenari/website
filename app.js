@@ -225,7 +225,10 @@ V.on(window,'scroll', function() {
     document.querySelectorAll('.bottom-nav-item').forEach(function(b) { b.classList.remove('active'); });
     homeBtn.classList.add('active');
   }
-});
+  // Elevate/condense the navbar once the page is scrolled
+  var nav = document.querySelector('.navbar');
+  if (nav) { nav.classList.toggle('scrolled', window.scrollY > 8); }
+}, { passive: true });
 
 // ═══════════════════ SCROLL REVEAL ═══════════════════
 const revealObserver = new IntersectionObserver(entries => {
@@ -683,6 +686,7 @@ function getEmbedUrl(t){
 
 function renderTestimonials(){
     var list = document.getElementById('testimonialList');
+    if (!list) return; // testimonial section removed from homepage
     list.innerHTML = testimonials.map(function(t, i){
         return '<button type="button" class="tst-chip' + (i === 0 ? ' active' : '') + '" data-index="' + i + '">' +
             '<span class="tst-chip-avatar">' + getInitials(t.name) + '</span>' +
@@ -705,6 +709,7 @@ function selectTestimonial(index, skipAnim){
     var screen = document.getElementById('testimonialScreen');
     var nameEl = document.getElementById('tstName');
     var roleEl = document.getElementById('tstRole');
+    if (!frame || !screen || !nameEl || !roleEl) return; // section removed
     var url    = getEmbedUrl(t);
 
     // Update active chip
